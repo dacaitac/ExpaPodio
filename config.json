@@ -1,0 +1,20 @@
+{
+  "podio": {
+    "clientId": "node-hxk8r0",
+    "clientSecret": "yit6uFJeyAqur0CbC1ciZxbGUIpMQtFcsuMd7C4Afg3kVY6lAoTCcKLoySe693gv",
+    "user": {
+      "username": "immanager@aiesec.org.pa",
+      "password": "aiesecenpanama2018"
+    },
+    "appToken": "ac254c52522c4e599e723312074005e8",
+    "appId": 21460631
+  },
+  "expa":{
+    "username": "yolanda.gomez@aiesec.net",
+    "password": "mercadofree95"
+  },
+  "typeform": {
+    "accessToken" : "C8m6E9aVR63rXhFxFqxU8Pcj68DYU5kHoy4g4gTjNSox",
+    "formId" : "LFqikz"
+  }
+}
