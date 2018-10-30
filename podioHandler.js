@@ -12,8 +12,6 @@ let clientSecret = config.podio.clientSecret
 // get the app ID and Token for appAuthentication
 let appId = config.podio.appId
 let appToken = config.podio.appToken
-const hookId = 8827377 // Just for testing
-const itemId = 957743195 // Just for testing
 
 // SDK de Podio con autenticacion por App
 const podio = new PodioJS({
@@ -165,12 +163,3 @@ function validateHook(hookId){
     })
     .catch(err => console.log(err))
 }
-
-// validateHook(hookId)
-// getHooks("app",appId)
-
-// async function getTheItem() {
-//   let item = await getItem(itemId)
-//   console.log(item);
-// }
-// getTheItem()
