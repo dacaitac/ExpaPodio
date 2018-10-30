@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
   res.status(200).send('Hello, world!');
 });
 
-app.post('/newItem', (req, res) => {
+app.get('/newItem', (req, res) => {
   // setValues(values)
   console.log(req.query);
   let podioItem = req.query
