@@ -1,0 +1,33 @@
+{
+  "name": "expapodio",
+  "version": "1.0.0",
+  "description": "This appplication takes a podio Item and creates it on Expa",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.16.4",
+    "json-patch": "^0.7.0",
+    "method-override": "^3.0.0",
+    "mongoose": "^5.3.4",
+    "node-gis-wrapper": "^0.0.2",
+    "podio-js": "^1.6.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dacaitac/ExpaPodio.git"
+  },
+  "keywords": [
+    "expa",
+    "podio",
+    "ep"
+  ],
+  "author": "Daniel Caita",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dacaitac/ExpaPodio/issues"
+  },
+  "homepage": "https://github.com/dacaitac/ExpaPodio#readme"
+}

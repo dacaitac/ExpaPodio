@@ -1,27 +1,59 @@
-let user = {
-  "user":{
-    "first_name": "Michael",
-    "last_name": "Victor",
-    "email": "i7.danielcc+test6@gmail.com",
-    "country_code": "+91",
-    "phone": "9845286710",
-    "password": "Aiesec123",
-    "lc": 1395
-  }
+var express = require("express"),
+    app = express(),
+    bodyParser  = require("body-parser"),
+    methodOverride = require("method-override");
+    mongoose = require('mongoose');
+const podio = require('./podioHandler')
+const colleges = require('./universities')
+const newPerson = require('./newPerson')
+
+let universities = require('./universities.json')
+let committees = require('./committees.json')
+
+
+async function toApp( appId ){
+  await podio.toAllItems( appId )
+    .then( itemId => {
+      let person = newPerson.setExpaPerson( itemId )
+      .catch( err => console.log( err ) )
+    })
+    .catch(err => console.log(err))
 }
 
-var request = require('request');
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-var options = {
-  uri: 'https://auth.aiesec.org/users.json',
-  method: 'POST',
-  form: user,
-  json: true
-};
+app.use(methodOverride());
 
-request(options, function (error, response, body) {
-  console.log(response.statusCode);
-  if (!error && response.statusCode == 200) {
-    console.log(body.id) // Print the shortened url.
-  }
+var router = express.Router();
+
+app.get('/', (req, res) => {
+  // setValues(values)
+  res.status(200).send('Hello, world!');
 });
+
+app.post('/newItem', (req, res) => {
+  // setValues(values)
+  console.log(req.query);
+  let podioItem = req.query
+  // podio.getItemValues(podioItem.itemId)
+  // .then(item => console.log(item))
+  newPerson.setExpaPerson( podioItem.itemId )
+  res.status(200).send('Confirm');
+});
+// [END hello_world]
+
+if (module === require.main) {
+  // [START server]
+  // Start the server
+  const server = app.listen(process.env.PORT || 8080, () => {
+    const port = server.address().port;
+    console.log(`App listening on port ${port}`);
+  });
+}
+module.exports = app;
+// ............................................................................
+
+
+// colleges.updateFields()
+// toApp( 21719955 )
