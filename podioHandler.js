@@ -78,7 +78,7 @@ exports.getField = function getField(appId, fieldId){
     .catch(err => console.log(err))
 }
 
-exports.toItem = function getItem (itemId) {
+exports.getItem = function getItem (itemId) {
   return new Promise ((resolve, reject) => {
     request('GET', `/item/${itemId}`, null)
     .then((response) => {
