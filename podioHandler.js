@@ -2,8 +2,8 @@
 
 const PodioJS = require('podio-js').api
 const fs = require('fs')
-const config = JSON.parse(fs.readFileSync('./config.json'))
 const jsonpatch = require('json-patch')
+let config = JSON.parse(fs.readFileSync('./config.json'))
 
 // get the API id/secret
 let clientId = config.podio.clientId
