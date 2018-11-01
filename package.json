@@ -13,6 +13,7 @@
   },
   "devDependencies": {},
   "scripts": {
+    "lint": "standard --fix",
     "start": "node index.js"
   },
   "repository": {
