@@ -1,9 +1,10 @@
 'use strict'
 
 var request         = require('request')
-const committees    = require('./committees')
-const universities  = require('./universities.json')
-const podio         = require('./podioHandler')
+const committees    = require('./committees'),
+      universities  = require('./universities.json'),
+      podio         = require('./podioHandler'),
+      mail          = require('./mail')
 
 let expaPerson = {
   "user":{
@@ -46,27 +47,31 @@ exports.setExpaPerson = async function setExpaPerson( itemId ) {
         default:
       }
     })
-    console.log( expaPerson )
+    // Envía el eMail luego de haber creado el perfil en EXPA
+    mail.sendMail( expaPerson )
+    // console.log( expaPerson )
   })
   .catch( error =>  console.log( error ) )
 
-  var options = {
-    uri   : 'https://auth.aiesec.org/users.json',
-    method: 'POST',
-    form  : expaPerson,
-    json  : true
-  }
 
-  let newPerson = {}
-  await request(options, function (error, response, body) {
-    console.log(response.statusCode)
-    if (!error && response.statusCode == 200) {
-      console.log(body.id)
-    }
-    newPerson = body
-  })
-  console.log(newPerson)
-  return newPerson
+  // var options = {
+  //   uri   : 'https://auth.aiesec.org/users.json',
+  //   method: 'POST',
+  //   form  : expaPerson,
+  //   json  : true
+  // }
+  //
+  // let newPerson = {}
+  // await request(options, function (error, response, body) {
+  //   console.log(response.statusCode)
+  //   if (!error && response.statusCode == 200) {
+  //     console.log(body.id)
+  //   }
+  //   newPerson = body
+  // })
+
+  // console.log(newPerson)
+  // return newPerson
 }
 
 // getTheItem(957745287)

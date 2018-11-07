@@ -6,48 +6,50 @@ var express         = require("express"),
     methodOverride  = require("method-override"),
     mongoose        = require("mongoose")
 
-const podio     = require('./podioHandler')
-const colleges  = require('./universities')
-const newPerson = require('./newPerson')
+let universities  = require('./universities.json'),
+    committees    = require('./committees.json')
 
-let universities  = require('./universities.json')
-let committees    = require('./committees.json')
+const podio       = require('./podioHandler'),
+      colleges    = require('./universities'),
+      newPerson   = require('./newPerson')
 
-async function toApp( appId ){
-  await podio.toAllItems( appId )
-    .then( itemId => {
-      let person = newPerson.setExpaPerson( itemId )
-      .catch( err => console.log( err ) )
-    })
-    .catch(err => console.log( err ) )
-}
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use(methodOverride());
+// async function toApp( appId ){
+//   await podio.toAllItems( appId )
+//     .then( itemId => {
+//       let person = newPerson.setExpaPerson( itemId )
+//       .catch( err => console.log( err ) )
+//     })
+//     .catch(err => console.log( err ) )
+// }
+//
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.json());
+// app.use(methodOverride());
+//
+// var router = express.Router();
+//
+// app.get('/', (req, res) => {
+//   res.status(200).send( 'Hello, world!' );
+// });
+//
+// app.get('/newItem', ( req, res ) => {
+//   console.log( req.query );
+//   let podioItem = req.query
+//   newPerson.setExpaPerson( podioItem.itemId )
+//   res.status( 200 ).send( 'Confirm' );
+// });
+//
+// if ( module === require.main ) {
+//   // [START server]
+//   // Start the server
+//   const server = app.listen(process.env.PORT || 80, () => {
+//     const port = server.address().port;
+//     console.log(`App listening on port ${port}`);
+//   });
+// }
+// module.exports = app;
 
-var router = express.Router();
-
-app.get('/', (req, res) => {
-  res.status(200).send( 'Hello, world!' );
-});
-
-app.get('/newItem', ( req, res ) => {
-  console.log( req.query );
-  let podioItem = req.query
-  newPerson.setExpaPerson( podioItem.itemId )
-  res.status( 200 ).send( 'Confirm' );
-});
-
-if ( module === require.main ) {
-  // [START server]
-  // Start the server
-  const server = app.listen(process.env.PORT || 80, () => {
-    const port = server.address().port;
-    console.log(`App listening on port ${port}`);
-  });
-}
-module.exports = app;
-
+newPerson.setExpaPerson( 972709320 )
 // colleges.updateFields()
 // toApp( 21719955 )

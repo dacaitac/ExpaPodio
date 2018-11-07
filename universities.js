@@ -6,12 +6,12 @@ const podio   = require('./podioHandler')
 var   expa    = require('node-gis-wrapper')(config.expa.username, config.expa.password);
 const MC_ID   = config.expa.mc_id
 
-config.podio.appId    = 21719955
-config.podio.appToken = 'a52b64b9d5b1452885d97dafc69c6cf8'
-
-let strConfig = JSON.stringify(config, null, 2)
-fs.writeFile("config.json", strConfig,
-              err => { if (err) console.log(err) })
+// config.podio.appId    = 21719955
+// config.podio.appToken = 'a52b64b9d5b1452885d97dafc69c6cf8'
+//
+// let strConfig = JSON.stringify(config, null, 2)
+// fs.writeFile("config.json", strConfig,
+//               err => { if (err) console.log(err) })
 
 let committees    = {}
 let universities  = {}

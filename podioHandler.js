@@ -48,8 +48,8 @@ function request (method, podioRequest, data) {
 // en este bloque se hace una autenticacion secundaria por usuario y contraseña
 
 var podio2 = new PodioJS({
-  authType: 'password',
-  clientId: clientId,
+  authType    : 'password',
+  clientId    : clientId,
   clientSecret: clientSecret
 })
 var username = config.podio.user.username
@@ -84,8 +84,8 @@ exports.getField = function getField( appId, fieldId ){
 exports.getItem = function getItem ( itemId ) {
   return new Promise ((resolve, reject) => {
     request('GET', `/item/${itemId}`, null)
-    .then((response) => {
-      resolve(response)
+    .then( ( response ) => {
+      resolve( response )
     })
     .catch(err => {
       reject(err)
