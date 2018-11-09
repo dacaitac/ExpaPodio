@@ -6,13 +6,6 @@ const podio   = require('./podioHandler')
 var   expa    = require('node-gis-wrapper')(config.expa.username, config.expa.password);
 const MC_ID   = config.expa.mc_id
 
-// config.podio.appId    = 21719955
-// config.podio.appToken = 'a52b64b9d5b1452885d97dafc69c6cf8'
-//
-// let strConfig = JSON.stringify(config, null, 2)
-// fs.writeFile("config.json", strConfig,
-//               err => { if (err) console.log(err) })
-
 let committees    = {}
 let universities  = {}
 let lcs           = []
@@ -21,10 +14,10 @@ let colleges      = []
 // Carga los comités desde EXPA y los guarda en el archivo universities.JSON
 // TODO: La idea es que se utilice este mismo programa para sincronizar
 // las universidades de EXPA con Podio
+
 async function updateUniversitiesField(){
   await expa.get(`/committees/${MC_ID}/lc_alignments`)
   .then( response => {
-    console.log(response)
     response.map( university => {
       universities[university.keywords] = university.lc.full_name
       committees[university.lc.full_name] = university.lc.id
@@ -91,8 +84,7 @@ async function updateUniversitiesField(){
     "hidden_create_view_edit": false
   }
 
-  console.log(objLcs);
   podio.updateField(config.podio.appId, 178889977, data )
   podio.updateField(config.podio.appId, 179564844, dataLC )
 }
-updateUniversitiesField()
+// updateUniversitiesField()

@@ -5,6 +5,8 @@ const fs        = require('fs')
 const jsonpatch = require('json-patch')
 let   config    = JSON.parse(fs.readFileSync('./config.json'))
 
+const newPerson = require('./newPerson')
+
 // get the API id/secret
 let clientId      = config.podio.clientId
 let clientSecret  = config.podio.clientSecret
@@ -64,7 +66,7 @@ function requestPass (method, podioRequest, data) {
       podio2.request( method, podioRequest, data )
         .then( response => {
           console.log('Podio request Complete')
-          console.log(response)
+          // console.log(response)
         })
         .catch(err => console.log( err ) )
     })
@@ -74,14 +76,18 @@ function requestPass (method, podioRequest, data) {
 // Llama todos los atributos de un campo en Podio
 // Para los solos valores es mejor usar la funcion getFieldValues
 exports.getField = function getField( appId, fieldId ){
-  return request( 'GET', `/app/${ appId }/field/${ fieldId }`, null )
-    .then( response => {
-      console.log(response.config.settings)
+  return new Promise ( (resolve, reject) => {
+    request( 'GET', `/app/${ appId }/field/${ fieldId }`, null )
+    .then( response => { resolve( response ) })
+    .catch(err => {
+      reject(err)
+      console.log(err)
     })
-    .catch(err => console.log( err ) )
+  })
 }
 
 exports.getItem = function getItem ( itemId ) {
+  console.log("Calling Item from Podio")
   return new Promise ((resolve, reject) => {
     request('GET', `/item/${itemId}`, null)
     .then( ( response ) => {
@@ -92,15 +98,6 @@ exports.getItem = function getItem ( itemId ) {
       console.log(err)
     })
   })
-}
-
-exports.getLinkedAccount = function getLinkedAccount(){
-  return requestPass('GET', `/linked_account`, null)
-    .then( (response) => {
-      console.log(response)
-      return response
-    })
-    .catch( error => console.log( error ) )
 }
 
 exports.updateField = async function updateField( appId, fieldId, data ){
@@ -133,7 +130,11 @@ exports.toAllItems = function toAllItems ( appId ) {
     request('GET', `/item/app/${appId}/`, null)
     .then( response => {
       let itemList = response.items
-      itemList.map( item => resolve(item.item_id) )
+      itemList.map( item => {
+        console.log(item.item_id);
+        newPerson.setExpaPerson( item.item_id )
+        resolve(item.item_id)
+      })
     })
     .catch( err => console.log( err ) )
   })
