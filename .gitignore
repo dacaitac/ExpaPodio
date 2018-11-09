@@ -7,8 +7,6 @@ npm-debug.log*
 pids
 *.pid
 *.seed
-universities.json
-committees.json
 config.json
 out
 helper.js
