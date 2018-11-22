@@ -18,6 +18,7 @@ let colleges      = []
 async function updateUniversitiesField(){
   await expa.get(`/committees/${MC_ID}/lc_alignments`)
   .then( response => {
+    console.log(response);
     response.map( university => {
       universities[university.keywords] = university.lc.full_name
       committees[university.lc.full_name] = university.lc.id
@@ -84,7 +85,8 @@ async function updateUniversitiesField(){
     "hidden_create_view_edit": false
   }
 
-  podio.updateField(config.podio.appId, 178889977, data )
-  podio.updateField(config.podio.appId, 179564844, dataLC )
+  console.log(data);
+  // podio.updateField(config.podio.appId, 179564844, dataLC )
+  // podio.updateField(config.podio.appId, 178889977, data )
 }
-// updateUniversitiesField()
+updateUniversitiesField()

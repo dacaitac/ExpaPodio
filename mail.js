@@ -22,7 +22,7 @@ exports.sendMail = function sendMail( expaPerson ){
   var mailOptions = {
     from    : config.gmail.user,
     to      : expaPerson.user.email,
-    subject : 'Bienvenido a AIESEC',
+    subject : 'Hoy empieza tu experiencia en AIESEC!',
     html    : template
   };
 
