@@ -66,7 +66,7 @@ exports.setExpaPerson = async function setExpaPerson( itemId ) {
   await request(options, function (error, response, body) {
     if (response.statusCode == 201){
       console.log("ExpaPerson created Succesfully")
-      mail.sendMail( expaPerson )
+      mail.sendNewPerson( expaPerson )
     }
 
     if (response.statusCode == 422){
@@ -82,5 +82,3 @@ exports.setExpaPerson = async function setExpaPerson( itemId ) {
 
   return newPerson
 }
-
-// getTheItem(957745287)

@@ -73,6 +73,45 @@ function requestPass (method, podioRequest, data) {
   })
 }
 
+
+var podio3 = new PodioJS({
+  authType: 'server',
+  clientId: clientId,
+  clientSecret: clientSecret
+});
+var redirectURL = 'https://www.myapp.com';
+
+// Your request handler (for example in ExpressJS)
+
+function requestServer( method, podioRequest, data ) {
+  var action = function(request, response) {
+    var authCode = request.query.code;
+    var errorCode = request.query.error;
+    podio3.isAuthenticated().then(function() {
+      // Ready to make API calls...
+    }).catch(function(err) {
+
+      if (typeof authCode !== 'undefined') {
+        podio3.getAccessToken(authCode, redirectURL, function(err, response) {
+          podio3.request( method, podioRequest, data )
+            .then( response => {
+              console.log('Podio request Complete')
+              // console.log(response)
+            })
+            .catch(err => console.log( err ) )
+          // make API calls here
+        });
+      } else if (typeof errorCode !== 'undefined') {
+        // a problem occured
+        console.log(request.query.error_description);
+      } else {
+        // start authentication via link or redirect
+        console.log(podio.getAuthorizationURL(redirectURL));
+      }
+    });
+  }
+}
+
 // Llama todos los atributos de un campo en Podio
 // Para los solos valores es mejor usar la funcion getFieldValues
 exports.getField = function getField( appId, fieldId ){
@@ -106,18 +145,16 @@ exports.updateField = async function updateField( appId, fieldId, data ){
   .catch( error =>  console.log( error ) )
 }
 
-//No funciona
-exports.updateItem = async function updateItem( itemId, data ){
-  await requestPass('PUT', `/item/${itemId}/value/`, data)
+exports.updateItem =  function updateItem( itemId, data ){
+  requestPass('PUT', `/item/${itemId}`, data)
   .then( response => console.log( response ) )
   .catch( error =>  console.log(error) )
 }
 
-//No funciona
-exports.newItem = function newItem(appId, data){
-  requestPass('POST', `/item/app/${appId}/`, data)
+exports.newItem = async function newItem(appId, data){
+  await requestPass('POST', `/item/app/${appId}/`, data)
   .then( responseData => {
-    console.log(responseData)
+    console.log('Creating Item');
   })
   .catch( error => {
     console.log(error)
@@ -132,7 +169,7 @@ exports.toAllItems = function toAllItems ( appId ) {
       let itemList = response.items
       itemList.map( item => {
         console.log(item.item_id);
-        newPerson.setExpaPerson( item.item_id )
+        // newPerson.setExpaPerson( item.item_id )
         resolve(item.item_id)
       })
     })
@@ -144,6 +181,17 @@ exports.toAllItems = function toAllItems ( appId ) {
 exports.getItemValues = function getItemValues( itemId ) {
   return new Promise (( resolve, reject ) => {
     request( 'GET', `/item/${ itemId }/value/v2`, null )
+      .then( response => resolve( response ) )
+      .catch( err => {
+        reject( err )
+        console.log( err )
+      })
+  })
+}
+
+exports.searchItem = function searchItem(appId, data){
+  return new Promise (( resolve, reject ) => {
+    request( 'GET', `/search/app/${appId}/v2`, data )
       .then( response => resolve( response ) )
       .catch( err => {
         reject( err )

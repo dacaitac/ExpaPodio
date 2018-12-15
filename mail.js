@@ -4,7 +4,7 @@ var swig        = require('swig'),
 const config    = JSON.parse(fs.readFileSync('./config.json'))
 
 // Compile a file and store it, rendering it later
-exports.sendMail = function sendMail( expaPerson ){
+exports.sendNewPerson = function sendNewPerson( expaPerson ){
   console.log("Creating eMail")
   let template = swig.renderFile('./src/SIGNup.html',{
     FIRSTNAME : expaPerson.user.first_name,
