@@ -89,4 +89,4 @@ async function updateUniversitiesField(){
   // podio.updateField(config.podio.appId, 179564844, dataLC )
   // podio.updateField(config.podio.appId, 178889977, data )
 }
-updateUniversitiesField()
+// updateUniversitiesField()

@@ -30,7 +30,7 @@ function request (method, podioRequest, data) {
   return new Promise((resolve, reject) => {
     data = data || null
     podio.authenticateWithApp(appId, appToken, (err) => {
-      if (err) reject(error)
+      if (err) reject(err)
 
       podio.isAuthenticated()
         .then(() => { // Ready to make API calls in here...
@@ -146,13 +146,13 @@ exports.updateField = async function updateField( appId, fieldId, data ){
 }
 
 exports.updateItem =  function updateItem( itemId, data ){
-  requestPass('PUT', `/item/${itemId}`, data)
-  .then( response => console.log( response ) )
+  request('PUT', `/item/${itemId}`, data)
+  .then( response => console.log( "Updating Item" ) )
   .catch( error =>  console.log(error) )
 }
 
 exports.newItem = async function newItem(appId, data){
-  await requestPass('POST', `/item/app/${appId}/`, data)
+  await request('POST', `/item/app/${appId}/`, data)
   .then( responseData => {
     console.log('Creating Item');
   })
@@ -201,7 +201,7 @@ exports.searchItem = function searchItem(appId, data){
 }
 
 function getHooks( itemId, fieldId ){
-  requestPass( 'PUT', ` /item/${ itemId }/value/${ fieldId }`, data )
+  requestPass( 'PUT', `/item/${ itemId }/value/${ fieldId }`, data )
     .then( response  => console.log( response ))
     .catch( err => console.log( err ) )
 }

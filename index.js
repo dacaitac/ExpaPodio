@@ -11,7 +11,8 @@ let universities  = require('./universities.json'),
 
 const podio       = require('./podioHandler'),
       colleges    = require('./universities'),
-      newPerson   = require('./newPerson')
+      newPerson   = require('./newPerson'),
+      igv         = require('./igvPodio');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -27,6 +28,26 @@ app.get('/newItem', ( req, res ) => {
   console.log( req.query );
   let podioItem = req.query
   newPerson.setExpaPerson( podioItem.itemId )
+  res.status( 200 ).send( 'Confirm' );
+});
+
+app.get('/updateOpp', ( req, res ) => {
+  // Recibe el id de una oportunidad y la actualiza en Podio
+  console.log( req.query );
+  igv.updateOpp( req.query.oppId )
+  res.status( 200 ).send( 'Confirm' );
+});
+
+app.get('/fetchOpps', ( req, res ) => {
+  // Recibe el id de una oportunidad y la actualiza en Podio
+  igv.fetchOpps(  )
+  res.status( 200 ).send( 'Confirm' );
+});
+
+app.get('/getEPs', ( req, res ) => {
+  // Recibe el id de una oportunidad y la actualiza en Podio
+  console.log( req.query );
+  igv.getEPs( req.query.oppId )
   res.status( 200 ).send( 'Confirm' );
 });
 

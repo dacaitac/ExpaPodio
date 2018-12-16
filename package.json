@@ -4,6 +4,7 @@
   "description": "This appplication takes a podio Item and creates it on Expa",
   "main": "index.js",
   "dependencies": {
+    "delay": "^4.1.0",
     "express": "^4.16.4",
     "json-patch": "^0.7.0",
     "method-override": "^3.0.0",
