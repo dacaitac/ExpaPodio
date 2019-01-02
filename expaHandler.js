@@ -5,7 +5,8 @@ const config  = JSON.parse(fs.readFileSync('./config.json'))
 var   expa    = require('node-gis-wrapper')(config.expa.username, config.expa.password);
 
 const podio   = require("./podioHandler"),
-      igv     = require('./igvPodio');
+      igv     = require('./igv/igvPodio')
+
 
 let token
 async function getToken(){
