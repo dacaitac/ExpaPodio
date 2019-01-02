@@ -45,11 +45,11 @@ function resetValues(values){
 }
 
 async function writeConfig( newConfig ){
-  await fs.writeFile('config.json', JSON.stringify(config, null, 2), function (err) {
+  console.log('Writing new config');
+  await fs.writeFileSync('config.json', JSON.stringify(newConfig, null, 2), function (err) {
     if (err) return console.log(err);
-    // console.log(JSON.stringify(config));
-    console.log('Writing new config');
   });
+  console.log("Config writted");
 }
 
 // Actualiza los dropdown del formulario de coperaciones según las categorias que se definen
@@ -57,7 +57,7 @@ async function writeConfig( newConfig ){
 exports.setCopValues = async function setCopValues( ){
   config.podio.appToken = "ac254c52522c4e599e723312074005e8"
   config.podio.appId = 21460631
-  writeConfig( config )
+  await writeConfig( config )
 
   // resetValues(copValues)
   for(field in copValues){

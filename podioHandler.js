@@ -3,28 +3,28 @@
 const PodioJS   = require('podio-js').api
 const fs        = require('fs')
 const jsonpatch = require('json-patch')
-let   config    = JSON.parse(fs.readFileSync('./config.json'))
-
-// get the API id/secret
-let clientId      = config.podio.clientId
-let clientSecret  = config.podio.clientSecret
-
-// get the app ID and Token for appAuthentication
-let appId     = config.podio.appId
-let appToken  = config.podio.appToken
-
-// SDK de Podio con autenticacion por App
-const podio = new PodioJS({
-  authType    : 'app',
-  clientId    : clientId,
-  clientSecret: clientSecret
-})
 
 // Simplifica los request que utilizan autenticacion por App
 // method: HTTP method
 // podioRequest: Podio API
 // Devuelve una promesa con el response de Podio
 function request (method, podioRequest, data) {
+  let config        = JSON.parse(fs.readFileSync('./config.json'))
+  let clientId      = config.podio.clientId
+  let clientSecret  = config.podio.clientSecret
+  // get the API id/secret
+
+  // get the app ID and Token for appAuthentication
+  let appId     = config.podio.appId
+  let appToken  = config.podio.appToken
+
+  // SDK de Podio con autenticacion por App
+  const podio = new PodioJS({
+    authType    : 'app',
+    clientId    : clientId,
+    clientSecret: clientSecret
+  })
+
   return new Promise((resolve, reject) => {
     data = data || null
     podio.authenticateWithApp(appId, appToken, (err) => {
@@ -42,72 +42,6 @@ function request (method, podioRequest, data) {
         .catch(err => console.log(err))
     })
   })
-}
-
-// Hay algunos endpoints que no permiten la autenticacion por app
-// en este bloque se hace una autenticacion secundaria por usuario y contraseña
-
-var podio2 = new PodioJS({
-  authType    : 'password',
-  clientId    : clientId,
-  clientSecret: clientSecret
-})
-var username = config.podio.user.username
-var password = config.podio.user.password
-
-function requestPass (method, podioRequest, data) {
-  return podio2.isAuthenticated().then(function() {
-  // Ready to make API calls...
-  }).catch(function(err) {
-    podio2.authenticateWithCredentials( username, password, function() {
-      // Make API calls here...
-      podio2.request( method, podioRequest, data )
-        .then( response => {
-          console.log('Podio request Complete')
-          // console.log(response)
-        })
-        .catch(err => console.log( err ) )
-    })
-  })
-}
-
-
-var podio3 = new PodioJS({
-  authType: 'server',
-  clientId: clientId,
-  clientSecret: clientSecret
-});
-var redirectURL = 'https://www.myapp.com';
-
-// Your request handler (for example in ExpressJS)
-
-function requestServer( method, podioRequest, data ) {
-  var action = function(request, response) {
-    var authCode = request.query.code;
-    var errorCode = request.query.error;
-    podio3.isAuthenticated().then(function() {
-      // Ready to make API calls...
-    }).catch(function(err) {
-
-      if (typeof authCode !== 'undefined') {
-        podio3.getAccessToken(authCode, redirectURL, function(err, response) {
-          podio3.request( method, podioRequest, data )
-            .then( response => {
-              console.log('Podio request Complete')
-              // console.log(response)
-            })
-            .catch(err => console.log( err ) )
-          // make API calls here
-        });
-      } else if (typeof errorCode !== 'undefined') {
-        // a problem occured
-        console.log(request.query.error_description);
-      } else {
-        // start authentication via link or redirect
-        console.log(podio.getAuthorizationURL(redirectURL));
-      }
-    });
-  }
 }
 
 // Llama todos los atributos de un campo en Podio
@@ -138,7 +72,7 @@ exports.getItem = function getItem ( itemId ) {
 }
 
 exports.updateField = async function updateField( appId, fieldId, data ){
-  await requestPass('PUT', `/app/${appId}/field/${fieldId}`, data)
+  await request('PUT', `/app/${appId}/field/${fieldId}`, data)
   .then( response => console.log( response ) )
   .catch( error =>  console.log( error ) )
 }
