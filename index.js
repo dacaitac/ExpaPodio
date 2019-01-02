@@ -9,7 +9,8 @@ var express         = require("express"),
 const podio       = require('./podioHandler'),
       newPerson   = require('./ogv/newPerson'),
       igv         = require('./igv/igvPodio'),
-      formUpdater = require('./igt/formUpdater');
+      formUpdater = require('./igt/formUpdater'),
+      agreement   = require('./igt/agreement')
 
 
 app.use(bodyParser.urlencoded({ extended: false }));

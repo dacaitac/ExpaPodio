@@ -134,7 +134,6 @@ exports.getAllItems = function getAllItems ( appId ) {
   return new Promise ((resolve, reject) => {
     request('GET', `/item/app/${appId}/`, {"limit": 100})
     .then( response => {
-      console.log(response);
       let itemList = response.items
       resolve(itemList)
     })

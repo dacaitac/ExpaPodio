@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "delay": "^4.1.0",
+    "dynamic-html-pdf": "0.0.4",
     "express": "^4.16.4",
     "json-patch": "^0.7.0",
     "method-override": "^3.0.0",
