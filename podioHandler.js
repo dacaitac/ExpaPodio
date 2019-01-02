@@ -100,7 +100,6 @@ exports.toAllItems = function toAllItems ( appId ) {
     .then( response => {
       let itemList = response.items
       itemList.map( item => {
-        console.log(item.item_id);
         resolve(item.item_id)
       })
     })

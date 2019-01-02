@@ -64,10 +64,7 @@ exports.setCopValues = async function setCopValues( ){
     copValues[field].data = await podio.getCategoryField(21460631, copValues[field].podio_id)
     .catch((err) => {
       console.log(err)
-    })
-    for (var val in copValues[field].data) {
-      console.log(copValues[field].data[val])
-    }
+    })    
   }
   typeform.updateForm(copFormId, copValues)
 }
