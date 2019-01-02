@@ -6,6 +6,7 @@ const fs       = require('fs'),
 const copFormId = 'LFqikz' // ID del formulario en typeform
 const audFormId = 'e5MPWx'
 const epFormId  = 'GFtkZF'
+const themis3   = 'urOY0q'
 
 let copValues = {
   'COMPANY_NAME': {
@@ -64,7 +65,7 @@ exports.setCopValues = async function setCopValues( ){
     copValues[field].data = await podio.getCategoryField(21460631, copValues[field].podio_id)
     .catch((err) => {
       console.log(err)
-    })    
+    })
   }
   typeform.updateForm(copFormId, copValues)
 }
@@ -81,7 +82,7 @@ exports.setAudValues = async function setAudValues(){
     // audValues[field].data = await podio.getAllItems(14636882)
     await podio.getAllItems(14636882).then( items =>{
       let titles = items.map(item => { return item.title })
-      audValues[field].data = titles
+      audValues.COMPANY_NAME.data = titles
     })
     .catch((err) => {
       console.log(err)
@@ -90,7 +91,7 @@ exports.setAudValues = async function setAudValues(){
   typeform.updateForm(audFormId, audValues)
 }
 
-exports.setEPValues = async function setEPValues(epValues){
+exports.setEPValues = async function setEPValues(){
   config.podio.appToken = "b61f7b326b874748b40858f47211374b"
   config.podio.appId = 21471912
   writeConfig( config )
@@ -98,13 +99,26 @@ exports.setEPValues = async function setEPValues(epValues){
   resetValues(epValues)
   for(field in epValues){
     // epValues[field].data = await podio.getAllItems(14636882)
-    await podio.getAllItems(21471912).then( items =>{
-      let titles = items.map(item => { return item.title })
-      epValues[field].data = titles
+
+    let filter = filterMonths("2018-11-01", "2019-11-01")
+    await podio.getFilterItems( 21471912, filter )
+    .then( items => {
+      epValues.EP_NAME.data = items.map(item => { return item.title })
     })
     .catch((err) => {
       console.log(err)
     })
   }
+  console.log(epValues);
   typeform.updateForm(epFormId, epValues)
+  // Themis fase 3
+  typeform.updateForm(themis3, epValues)
+}
+
+function filterMonths(from, to){
+  let filter = {
+    "filters": { "created_on": {'from': from, 'to': to} },
+    "limit": 500
+  }
+  return filter
 }

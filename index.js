@@ -82,7 +82,6 @@ app.get('/newEP', (req, res) => {
     console.log(req.query);
     agreement.createAg(req.query)
   }
-
   res.status(200).send('EP form Updated');
 });
 

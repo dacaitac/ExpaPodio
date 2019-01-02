@@ -141,6 +141,20 @@ exports.getAllItems = function getAllItems ( appId ) {
   })
 }
 
+exports.getFilterItems = function getFilterItems( appId, filter ) {
+  return new Promise(function(resolve, reject) {
+    request('POST', `/item/app/${appId}/filter`, filter)
+    .then( responseData => {
+      console.log(`Items Encontrados: ${responseData.filtered}`);
+      resolve(responseData.items)
+    })
+    .catch( error => {
+      console.log(error)
+      reject(error)
+    })
+  });
+}
+
 exports.getCategoryField = function getCategoryField(appId, fieldId){
   return new Promise((resolve, reject) => {
     request('GET', `/app/${appId}/field/${fieldId}`)
