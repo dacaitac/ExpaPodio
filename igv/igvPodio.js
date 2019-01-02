@@ -1,10 +1,10 @@
 const fs      = require('fs')
 const config  = JSON.parse(fs.readFileSync('./config.json'))
 var   expa    = require('node-gis-wrapper')(config.expa.username, config.expa.password);
-const podio   = require("./podioHandler")
+const podio   = require("../podioHandler")
 
-let oppsDB  = JSON.parse(fs.readFileSync('./opps.json'))
-let epsDB   = JSON.parse(fs.readFileSync('./eps.json'))
+let oppsDB  = JSON.parse(fs.readFileSync('./igv/opps.json'))
+let epsDB   = JSON.parse(fs.readFileSync('./igv/eps.json'))
 const DATE = new Date("2018-08-01T00:00:00.000Z")
 
 let dicOpp = {}
@@ -13,18 +13,25 @@ const oppApp = 21925473
 const epApp  = 21915341
 
 function saveFile( jsonDB, name ){
-  if(name === "config" && config.podio.appId === jsonDB.podio.appId)
-   return
-
-  fs.writeFile(`./${name}.json`, JSON.stringify(jsonDB, null, 4), (err) => {
-  if (err) {
-      console.error(err);
-      return;
-  };
-    if(name == "opps") dicOpp = jsonDB
-    if(name == "eps")  dicEps = jsonDB
-    console.log("File has been written");
-  });
+  if(name === "config"){
+    fs.writeFile(`./${name}.json`, JSON.stringify(jsonDB, null, 4), (err) => {
+      if (err) {
+          console.error(err)
+          return
+      }
+    })
+  }
+  else{
+    fs.writeFile(`./igv/${name}.json`, JSON.stringify(jsonDB, null, 4), (err) => {
+      if (err) {
+        console.error(err);
+        return;
+      };
+      if(name == "opps") dicOpp = jsonDB
+      if(name == "eps")  dicEps = jsonDB
+    });
+  }
+  console.log(`File ${name}.json has been written`);
 }
 
 //Trae todas las oportunidades de expa y las envia a Podio
@@ -244,7 +251,6 @@ async function sendPodioOpp( item, appId, action ){
       "query": item.opId,
       "ref_type": "item"
     }
-
     podio.searchItem(oppApp, data)
     .then( found => { podio.updateItem(found.results[0].id, request) })
   }
@@ -277,7 +283,12 @@ async function getOpp(oppId){
 // los nuevos EPs
 exports.fetchOpps = async function fetchOpps(){
   console.log("Fetching opportunities...");
-  oppsDB  = JSON.parse(fs.readFileSync('./opps.json'))
+  oppsDB  = JSON.parse(fs.readFileSync('./igv/opps.json'))
+
+  config.podio.appId = oppApp
+  config.podio.appToken = "3996d87d31b04b7f9f7fd59013ea4869"
+  await saveFile(config, "config")
+
   getExpaOpps( DATE )
   .then( async function(opps) {
     for (var i = 0; i < opps.length; i++) {
@@ -289,8 +300,9 @@ exports.fetchOpps = async function fetchOpps(){
           console.log("New Applicants in Opp " + opp.opId);
           oppsDB[ opp.opId ] = opp
           sendPodioOpp(opp, oppApp, "update") //Actualiza la oportunidad en Podio
-          getEPs(opp)
+          getEPs(opp.opId)
         }
+        console.log("Opportunity "+ opp.opId + " already updated.");
       }
       // Si hay nuevas oportunidades las envia a podio
       else if( op.programmes.short_name == "GV"){
@@ -301,7 +313,7 @@ exports.fetchOpps = async function fetchOpps(){
         getExpaEps( opp.opId, DATE )
         .then( async function(eps) {
           for (var i = 0; i < eps.length; i++) {
-            let ep = setPodioEP(eps[i], opp )
+            let ep = await setPodioEP(eps[i], opp )
             sendPodioEp(ep, epApp)
           }
         })
@@ -313,8 +325,12 @@ exports.fetchOpps = async function fetchOpps(){
 
 // Actualiza los datos de una oportunidad
 // si tiene nuevos EPs los trae
-exports.updateOpp = function updateOpp( oppId ){
-  oppsDB  = JSON.parse(fs.readFileSync('./opps.json'))
+exports.updateOpp = async function updateOpp( oppId ){
+  config.podio.appId = oppApp
+  config.podio.appToken = "3996d87d31b04b7f9f7fd59013ea4869"
+  await saveFile(config, "config")
+
+  oppsDB  = JSON.parse(fs.readFileSync('./igv/opps.json'))
   return new Promise(function(resolve, reject) {
     let token = ""
     expa.getToken()
@@ -342,8 +358,11 @@ exports.updateOpp = function updateOpp( oppId ){
 // Configura el objeto de expa para que sea manipulable en el programa
 // y sea mas facil su configuracion para enviar a podio
 async function setPodioEP( ep, opp ){
+  config.podio.appId = oppApp
+  config.podio.appToken = "3996d87d31b04b7f9f7fd59013ea4869"
+  await saveFile(config, "config")
   let newEp = {}
-  let oppItemId
+
 
   let data = {
     "app_id": oppApp,
@@ -351,9 +370,14 @@ async function setPodioEP( ep, opp ){
     "ref_type": "item"
   }
 
-  await podio.searchItem(oppApp, data)
+  let oppItemId = await podio.searchItem(oppApp, data)
   .then( found => {
-    oppItemId = found.results[0].id
+    return found.results[0].id
+  })
+
+  let host_lc = await podio.getItemValues(oppItemId)
+  .then( value => {
+    return value.entidad.text
   })
 
   newEp.name = ep.person.first_name
@@ -364,7 +388,7 @@ async function setPodioEP( ep, opp ){
   newEp.nationality = ep.person.nationalities[0].name
   newEp.id = ep.id.toString()
   newEp.expaAns = ep.gt_answer
-  newEp.lc_host = opp.LC
+  newEp.lc_host = host_lc
   newEp.status = ep.status
   newEp.oppId = oppItemId
 
@@ -373,7 +397,7 @@ async function setPodioEP( ep, opp ){
 
 // Envia un EP previamente configurado en setPodioEP a la aplicacion appId de podio
 async function sendPodioEp( ep, appId ){
-  config.podio.appId = epApp
+  config.podio.appId = 21915341
   config.podio.appToken = "443bc90fe89b4a54ada1946ddc02d706"
   await saveFile(config, "config")
 
@@ -496,6 +520,8 @@ function getExpaEps( opp, createdFrom ){
     })
     .then( async function(request){
       let response = await expa.get(`/opportunities/${opp}/applications`, request)
+                               .catch(console.log)
+
       let pages = response.paging.total_pages
       if( pages == 1){
         for(let dat in response.data){
@@ -529,9 +555,9 @@ function getExpaEps( opp, createdFrom ){
 // Lleva todos los aplicantes de una oportunidad a Podio
 // Si ya existe uno no hace nada
 async function getEPs( opp ){
-  epsDB   = JSON.parse(fs.readFileSync('./eps.json'))
-  let eps   = await getExpaEps(opp.opId, DATE)
-  console.log(`EPs from ${opp.opId} Loaded`);
+  epsDB   = JSON.parse(fs.readFileSync('./igv/eps.json'))
+  let eps = await getExpaEps(opp, DATE)
+  console.log(`EPs from ${opp} Loaded`)
 
   for (var i = 0; i < eps.length; i++) {
     let newEp = await setPodioEP( eps[i], opp )
@@ -544,11 +570,12 @@ async function getEPs( opp ){
   }
   saveFile(epsDB, "eps")
 }
+exports.importEPs = oppId => getEPs( oppId)
 
 // Compara los EPs de una oportunidad, si la oportunidad oldOp, tiene mas
 // EPs que la que hay en la base de EPs los crea
 async function getNewEPs(newOp, oldOp){
-  epsDB   = JSON.parse(fs.readFileSync('./eps.json'))
+  epsDB   = JSON.parse(fs.readFileSync('./igv/eps.json'))
   if(newOp.numAps == oldOp.numAps){
     console.log("No new EPs were found");
     return

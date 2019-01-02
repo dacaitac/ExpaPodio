@@ -3,8 +3,8 @@
 var request         = require('request')
 const committees    = require('./committees'),
       universities  = require('./universities.json'),
-      podio         = require('./podioHandler'),
-      mail          = require('./mail')
+      podio         = require('../podioHandler'),
+      mail          = require('../mail')
 
 let expaPerson = {
   "user":{

@@ -5,8 +5,6 @@ const fs        = require('fs')
 const jsonpatch = require('json-patch')
 let   config    = JSON.parse(fs.readFileSync('./config.json'))
 
-const newPerson = require('./newPerson')
-
 // get the API id/secret
 let clientId      = config.podio.clientId
 let clientSecret  = config.podio.clientSecret
@@ -169,7 +167,6 @@ exports.toAllItems = function toAllItems ( appId ) {
       let itemList = response.items
       itemList.map( item => {
         console.log(item.item_id);
-        // newPerson.setExpaPerson( item.item_id )
         resolve(item.item_id)
       })
     })
@@ -200,14 +197,30 @@ exports.searchItem = function searchItem(appId, data){
   })
 }
 
-function getHooks( itemId, fieldId ){
-  requestPass( 'PUT', `/item/${ itemId }/value/${ fieldId }`, data )
-    .then( response  => console.log( response ))
+exports.getAllItems = function getAllItems ( appId ) {
+  return new Promise ((resolve, reject) => {
+    request('GET', `/item/app/${appId}/`, {"limit": 100})
+    .then( response => {
+      console.log(response);
+      let itemList = response.items
+      resolve(itemList)
+    })
     .catch( err => console.log( err ) )
+  })
 }
 
-function validateHook( hookId ){
-  request( 'POST', `/hook/${ hookId }/verify/validate`, {"code": "code"} )
-    .then( response => console.log( response ) )
-    .catch( err => console.log( err ) )
+exports.getCategoryField = function getCategoryField(appId, fieldId){
+  return new Promise((resolve, reject) => {
+    request('GET', `/app/${appId}/field/${fieldId}`)
+      .then((response) =>{
+        let list = []
+        let options = response.config.settings.options;
+        options = options.filter(option => option.status == 'active')
+        options.map((option) => {
+          list.push(option.text)
+        })
+        resolve(list)
+      })
+      .catch(err => reject(err))
+  })
 }
