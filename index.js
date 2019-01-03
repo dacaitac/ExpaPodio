@@ -10,7 +10,7 @@ const podio       = require('./podioHandler'),
       newPerson   = require('./ogv/newPerson'),
       igv         = require('./igv/igvPodio'),
       formUpdater = require('./igt/formUpdater'),
-      agreement   = require('./igt/agreement')
+      agreement   = require('./igt/pdfHandler')
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -83,6 +83,12 @@ app.get('/newEP', (req, res) => {
     agreement.createAg(req.query)
   }
   res.status(200).send('EP form Updated');
+});
+
+app.get('/themis3', (req, res) => {
+  let name = req.query.name
+  formUpdater.themis3(name)
+  res.status(200).send('Themis phase 3 completed');
 });
 
 if ( module === require.main ) {

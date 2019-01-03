@@ -1,7 +1,8 @@
 const fs       = require('fs'),
       config   = JSON.parse(fs.readFileSync('./config.json')),
       podio    = require('../podioHandler'),
-      typeform = require('../typeformHandler')
+      typeform = require('../typeformHandler'),
+      pdf      = require('./pdfHandler')
 
 const copFormId = 'LFqikz' // ID del formulario en typeform
 const audFormId = 'e5MPWx'
@@ -38,6 +39,14 @@ let epValues = {
     'typeform_id': 0,
     'data': []
   }
+}
+
+function filterMonths(from, to){
+  let filter = {
+    "filters": { "created_on": {'from': from, 'to': to} },
+    "limit": 500
+  }
+  return filter
 }
 
 function resetValues(values){
@@ -100,7 +109,7 @@ exports.setEPValues = async function setEPValues(){
   for(field in epValues){
     // epValues[field].data = await podio.getAllItems(14636882)
 
-    let filter = filterMonths("2018-11-01", "2019-11-01")
+    let filter = filterMonths("2018-07-01", "2019-07-01")
     await podio.getFilterItems( 21471912, filter )
     .then( items => {
       epValues.EP_NAME.data = items.map(item => { return item.title })
@@ -115,10 +124,23 @@ exports.setEPValues = async function setEPValues(){
   typeform.updateForm(themis3, epValues)
 }
 
-function filterMonths(from, to){
-  let filter = {
-    "filters": { "created_on": {'from': from, 'to': to} },
-    "limit": 500
+exports.themis3 = async function themis3(name){
+  let data = {
+    "app_id": 21471912,
+    "query": name,
+    "ref_type": "item"
   }
-  return filter
+
+  let ep = await podio.searchItem(21471912, data)
+  .then( found => {
+    let item = {}
+    item.id = found.results[0].id,
+    item.name = found.results[0].title
+    return item
+  })
+
+  let it = await podio.getItemValues(ep.id)
+  ep.passport = it["numero-pasaporte"]
+  ep.correo = it["email"]
+  pdf.createTerms(ep)
 }
