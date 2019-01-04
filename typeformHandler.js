@@ -45,8 +45,7 @@ function getTypeformForm(formId){
   })
 }
 
-async function updateDropdown(formId, fieldId, data){
-  let form = await getTypeformForm(formId).catch(console.log)
+async function updateDropdown(formId, fieldId, data, form){
   let newChoices = []
 
   for (let i = 0; i < data.length; i++) {
@@ -55,6 +54,7 @@ async function updateDropdown(formId, fieldId, data){
     newChoices.push(choice)
   }
   form.fields[fieldId].properties.choices = newChoices
+  // console.log(form.fields[fieldId].properties.choices);
   return form
 }
 
@@ -66,11 +66,12 @@ exports.updateForm = async function(formId, values){
   for(field in values){
     // console.log(values[field].data);
     if(Array.isArray(values[field].data)){ //TODO: Actualizar cuando no es array
-      form = await updateDropdown(formId, values[field].typeform_id, values[field].data)
+      form = await updateDropdown(formId, values[field].typeform_id, values[field].data, form)
                   .catch(console.log)
     }else{
       console.log("Data is not an array")
     }
   }
+  console.log(form.fields[3].properties.choices);
   putForm(form, formId)
 }
