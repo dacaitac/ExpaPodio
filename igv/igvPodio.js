@@ -253,6 +253,7 @@ async function sendPodioOpp( item, appId, action ){
     }
     podio.searchItem(oppApp, data)
     .then( found => { podio.updateItem(found.results[0].id, request) })
+    .catch(console.log)
   }
 }
 
@@ -366,10 +367,11 @@ async function setPodioEP( ep, opp ){
 
   let data = {
     "app_id": oppApp,
-    "query": opp.opId,
+    "query": opp,
     "ref_type": "item"
   }
 
+  console.log(data);
   let oppItemId = await podio.searchItem(oppApp, data)
   .then( found => {
     return found.results[0].id
