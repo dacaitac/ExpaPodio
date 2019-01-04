@@ -14,7 +14,7 @@ const epApp  = 21915341
 
 function saveFile( jsonDB, name ){
   if(name === "config"){
-    fs.writeFile(`./${name}.json`, JSON.stringify(jsonDB, null, 4), (err) => {
+    fs.writeFileSync(`./${name}.json`, JSON.stringify(jsonDB, null, 4), (err) => {
       if (err) {
           console.error(err)
           return
@@ -22,7 +22,7 @@ function saveFile( jsonDB, name ){
     })
   }
   else{
-    fs.writeFile(`./igv/${name}.json`, JSON.stringify(jsonDB, null, 4), (err) => {
+    fs.writeFileSync(`./igv/${name}.json`, JSON.stringify(jsonDB, null, 4), (err) => {
       if (err) {
         console.error(err);
         return;
