@@ -72,6 +72,5 @@ exports.updateForm = async function(formId, values){
       console.log("Data is not an array")
     }
   }
-  console.log(form.fields[3].properties.choices);
   putForm(form, formId)
 }

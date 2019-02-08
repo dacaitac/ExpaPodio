@@ -28,6 +28,10 @@ exports.createAg = async function createAg( json ){
   let filename2 = `Agreement ${json.nombre}.pdf`
 
   let date = new Date()
+
+  // 1 Español
+  // 2 Ingles
+
   let document = {
       template: html,
       context: {
@@ -44,13 +48,12 @@ exports.createAg = async function createAg( json ){
       },
       path: `./${filename}`
   }
-
   let document2 = {
       template: html2,
       context: {
           options: {
               dia: date.getDate(),
-              mes: date.getMonth(),
+              mes: date.getMonth()+1,
               anio: date.getFullYear(),
               nombre: json.nombre,
               pasaporte: json.pasaporte,
@@ -61,24 +64,6 @@ exports.createAg = async function createAg( json ){
       },
       path: `./${filename2}`
   }
-
-  await pdf.create(document, options)
-      .then(res => {
-          console.log(res)
-      })
-      .catch(error => {
-          console.error(error)
-      });
-
-  await pdf.create(document2, options)
-      .then(res => {
-          console.log(res)
-      })
-      .catch(error => {
-          console.error(error)
-      });
-
-
 
   let transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -92,12 +77,36 @@ exports.createAg = async function createAg( json ){
     from: config.gmail.user,
     to: json.correo,
     subject: 'Proceso de Legalización',
-    text: 'We have received your information.Thank you! The next document is the agreement of understanding that you signed.',
-    html: mailHtml,
-    attachments: [
-      {filename:`${filename}`, path: `./${filename}`},
-      {filename:`${filename2}`, path: `./${filename2}`}
-    ]
+    text: 'We have received your information. Thank you! The next document is the agreement of understanding that you signed.',
+    html: mailHtml
+  }
+
+  if(json.lang === "Español"){
+    await pdf.create(document, options)
+        .then(res => {
+            console.log(res)
+        })
+        .catch(error => {
+            console.error(error)
+        });
+
+    mailOptions.subject = "Proceso de Legalización."
+    mailOptions.text = "Hemos recibido tu información. Gracias! El siguiente documento es el acuerdo que has aceptado."
+    mailOptions.attachments = [ {filename:`${filename}`, path: `./${filename}`} ]
+  }
+
+  if(json.lang === "Ingles"){
+    await pdf.create(document2, options)
+        .then(res => {
+            console.log(res)
+        })
+        .catch(error => {
+            console.error(error)
+        });
+
+    mailOptions.subject = "Legalization Process"
+    mailOptions.text = "We have received your information. Thank you! The next document is the agreement of understanding that you signed."
+    mailOptions.attachments = [ {filename:`${filename2}`, path: `./${filename2}`} ]
   }
 
   transporter.sendMail(mailOptions, function(error, info){
@@ -128,7 +137,6 @@ exports.createTerms = async function createTerms( json ){
       },
       path: `./${filename}`
   }
-
   let document2 = {
       template: final,
       context: {
@@ -159,8 +167,6 @@ exports.createTerms = async function createTerms( json ){
           console.error(error)
       });
 
-
-
   let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -189,7 +195,6 @@ exports.createTerms = async function createTerms( json ){
     }
   })
 }
-
 
 let query = {
     nombre: 'NOMBRE',
